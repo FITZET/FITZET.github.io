@@ -1,6 +1,39 @@
 (function () {
   "use strict";
 
+  function savedContent() {
+    try { return JSON.parse(localStorage.getItem("cv-site-content-v3")) || window.siteContent; } catch { return window.siteContent; }
+  }
+  const EDIT_MODE = document.body.classList.contains("editing");
+  let activeContent;
+  function editable(value, path) { const safe = escapeHtml(value || ""); return EDIT_MODE ? `<span contenteditable="true" data-edit-path="${path}">${safe}</span>` : safe; }
+
+  function renderProfile(content) {
+    const profile = content.profile || {};
+    const links = (profile.links || []).map((link, i) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${editable(link.label, `profile.links.${i}.label`)}</a>`).join('<span aria-hidden="true">/</span>');
+    document.getElementById("profile-root").innerHTML = `<section class="intro" id="top"><div class="intro-copy"><p class="eyebrow">${editable(profile.eyebrow, "profile.eyebrow")}</p><h1>${editable(profile.name, "profile.name")}</h1><p class="affiliation">${editable(profile.affiliation, "profile.affiliation")}</p>${(profile.bio || []).map((p, i) => `<p>${editable(p, `profile.bio.${i}`)}</p>`).join("")}<nav class="profile-links">${links}</nav></div><aside class="portrait-card">${profile.photo ? `<img class="portrait-image" src="${escapeHtml(profile.photo)}" alt="Portrait of ${escapeHtml(profile.name || "")}" width="230" height="280">` : ""}</aside></section>`;
+  }
+
+  function renderSection(section, path) {
+    const heading = `<h2>${editable(section.title || "Untitled section", `${path}.title`)}</h2>`;
+    const controls = EDIT_MODE ? `<div class="section-editor-controls"><button data-add-entry="${path}">＋ 添加条目</button><button data-delete-section="${path}">删除本栏目</button></div>` : "";
+    const cards = `<div class="interest-grid">${(section.items || []).map((item, i) => `<article><span class="interest-index">${String(i + 1).padStart(2, "0")}</span><h3>${editable(item.title, `${path}.items.${i}.title`)}</h3><p>${editable(item.text, `${path}.items.${i}.text`)}</p></article>`).join("")}</div>`;
+    if (section.type === "research") return `<section class="section">${heading}${(section.body || []).map((p, i) => `<p>${editable(p, `${path}.body.${i}`)}</p>`).join("")}${cards}${controls}</section>`;
+    if (section.type === "cards") return `<section class="section">${heading}${cards}${controls}</section>`;
+    if (section.type === "news") return `<section class="section"><div class="section-heading-row">${heading}<span class="section-note">${editable(section.note || "", `${path}.note`)}</span></div><ul class="news-list">${(section.items || []).map((item, i) => `<li><time>${editable(item.date, `${path}.items.${i}.date`)}</time><span class="news-tag ${escapeHtml((item.tag || "").toLowerCase())}">${editable(item.tag, `${path}.items.${i}.tag`)}</span><span>${editable(item.text, `${path}.items.${i}.text`)}</span></li>`).join("")}</ul>${controls}</section>`;
+    if (section.type === "timeline") return `<section class="section">${heading}<ul class="activity-list">${(section.items || []).map((item, i) => `<li><time>${editable(item.date, `${path}.items.${i}.date`)}</time><div><strong>${editable(item.title, `${path}.items.${i}.title`)}</strong>${item.text ? `<br>${editable(item.text, `${path}.items.${i}.text`)}` : ""}</div></li>`).join("")}</ul>${controls}</section>`;
+    return `<section class="section">${heading}${(section.body || []).map((p, i) => `<p>${editable(p, `${path}.body.${i}`)}</p>`).join("")}${controls}</section>`;
+  }
+
+  function renderContent() {
+    const content = activeContent = savedContent() || {};
+    renderProfile(content);
+    document.getElementById("before-publications").innerHTML = (content.beforePublications || []).map((section, index) => renderSection(section, `beforePublications.${index}`)).join("");
+    document.getElementById("after-publications").innerHTML = (content.afterPublications || []).map((section, index) => renderSection(section, `afterPublications.${index}`)).join("");
+    document.getElementById("site-footer").innerHTML = `<p>${escapeHtml(content.footer || "") } · <a href="#top">Back to top</a></p>`;
+    if (content.profile && content.profile.name) document.title = content.profile.name;
+  }
+
   const SELF = "Zixuan Shen";
   const list = document.getElementById("publication-list");
   const counter = document.getElementById("publication-count");
@@ -16,6 +49,28 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  renderContent();
+
+  if (EDIT_MODE) {
+    const history = [];
+    const undoButton = document.getElementById("undo-content");
+    const updateUndoButton = () => { if (undoButton) undoButton.disabled = history.length === 0; };
+    const remember = () => { history.push(JSON.stringify(activeContent)); if (history.length > 50) history.shift(); updateUndoButton(); };
+    const setPath = (path, value) => { const keys = path.split("."); const finalKey = keys.pop(); const target = keys.reduce((obj, key) => obj[key], activeContent); target[finalKey] = value; };
+    const persist = () => { localStorage.setItem("cv-site-content-v3", JSON.stringify(activeContent)); const status = document.getElementById("save-status"); if (status) status.textContent = "已保存到本机"; };
+    document.addEventListener("focusin", (event) => { if (event.target.closest("[data-edit-path]")) remember(); });
+    document.addEventListener("input", (event) => { const node = event.target.closest("[data-edit-path]"); if (!node) return; setPath(node.dataset.editPath, node.textContent.trim()); persist(); });
+    document.addEventListener("click", (event) => {
+      const add = event.target.closest("[data-add-entry]"); const remove = event.target.closest("[data-delete-section]"); const newSection = event.target.closest("[data-new-section]");
+      if (add) { remember(); const section = add.dataset.addEntry.split(".").reduce((obj, key) => obj[key], activeContent); section.items = section.items || []; section.items.push(section.type === "news" ? { date: "2026", tag: "News", text: "New update" } : { date: "2026", title: "New entry", text: "Add details here." }); persist(); renderContent(); }
+      if (remove) { remember(); const keys = remove.dataset.deleteSection.split("."); const index = Number(keys.pop()); keys.reduce((obj, key) => obj[key], activeContent).splice(index, 1); persist(); renderContent(); }
+      if (newSection) { remember(); activeContent[newSection.dataset.newSection].push({ type: "text", title: "New Section", body: ["Click here to edit this text."] }); persist(); renderContent(); }
+    });
+    undoButton?.addEventListener("click", () => { if (!history.length) return; activeContent = JSON.parse(history.pop()); persist(); renderContent(); updateUndoButton(); });
+    document.getElementById("export-content")?.addEventListener("click", () => { const source = `window.siteContent = ${JSON.stringify(activeContent, null, 2)};\n`; const url = URL.createObjectURL(new Blob([source], { type: "text/javascript" })); const link = document.createElement("a"); link.href = url; link.download = "site-content.js"; link.click(); URL.revokeObjectURL(url); });
+    document.getElementById("publish-content")?.addEventListener("click", () => { alert("一键发布需要先连接 GitHub 授权。为了不在网页中保存你的 GitHub 密钥，我会在授权通道可用后把这里接成真正的一次点击发布。"); });
   }
 
   function renderAuthors(authors) {
