@@ -70,7 +70,23 @@
     });
     undoButton?.addEventListener("click", () => { if (!history.length) return; activeContent = JSON.parse(history.pop()); persist(); renderContent(); updateUndoButton(); });
     document.getElementById("export-content")?.addEventListener("click", () => { const source = `window.siteContent = ${JSON.stringify(activeContent, null, 2)};\n`; const url = URL.createObjectURL(new Blob([source], { type: "text/javascript" })); const link = document.createElement("a"); link.href = url; link.download = "site-content.js"; link.click(); URL.revokeObjectURL(url); });
-    document.getElementById("publish-content")?.addEventListener("click", () => { alert("一键发布需要先连接 GitHub 授权。为了不在网页中保存你的 GitHub 密钥，我会在授权通道可用后把这里接成真正的一次点击发布。"); });
+    document.getElementById("publish-content")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      button.textContent = "正在发布…";
+      try {
+        const response = await fetch("/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(activeContent) });
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.output || "Publication failed");
+        document.getElementById("save-status").textContent = "已发布，页面将在约 1–2 分钟后更新";
+        alert("发布成功。GitHub Pages 正在更新。\n\n" + result.output);
+      } catch (error) {
+        alert("发布失败：\n" + error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "一键发布";
+      }
+    });
   }
 
   function renderAuthors(authors) {
