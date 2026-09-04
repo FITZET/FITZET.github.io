@@ -65,9 +65,19 @@ window.siteContent = {
           "text": "Our preprint on unified lookup-table inference with signed-digit K/V caches for ternary LLMs is available on arXiv."
         },
         {
+          "date": "Aug. 2026",
+          "tag": "Paper",
+          "text": "MT-REN, an end-to-end GVD-NeuroSLAM accelerator for autonomous microrobots, accepted in IEEE TVLSI."
+        },
+        {
           "date": "May 2026",
           "tag": "Talk",
           "text": "Presented neuromorphic computing chip designs for micro and nano intelligent robots at the IEEE CASS Wudang Workshop."
+        },
+        {
+          "date": "Apr. 2026",
+          "tag": "Activ",
+          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter Assisted IEEE CASS with ISCAS conference program."
         },
         {
           "date": "May 2026",
@@ -78,16 +88,6 @@ window.siteContent = {
           "date": "Mar. 2026",
           "tag": "Paper",
           "text": "Our in-situ DRAM RowHammer defense circuit appeared at IEEE EDTM 2026."
-        },
-        {
-          "date": "Aug. 2026",
-          "tag": "Paper",
-          "text": "MT-REN, an end-to-end GVD-NeuroSLAM accelerator for autonomous microrobots, accepted in IEEE TVLSI."
-        },
-        {
-          "date": "Apr. 2026",
-          "tag": "Activ",
-          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter Assisted IEEE CASS with ISCAS conference program."
         }
       ]
     },
