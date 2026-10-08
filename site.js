@@ -2,7 +2,7 @@
   "use strict";
 
   function savedContent() {
-    try { return JSON.parse(localStorage.getItem("cv-site-content-v3")) || window.siteContent; } catch { return window.siteContent; }
+    try { return JSON.parse(localStorage.getItem("cv-site-content-v4")) || window.siteContent; } catch { return window.siteContent; }
   }
   const EDIT_MODE = document.body.classList.contains("editing");
   let activeContent;
@@ -39,7 +39,7 @@
   const counter = document.getElementById("publication-count");
   const buttons = Array.from(document.querySelectorAll(".filter-button"));
   let publications;
-  try { publications = EDIT_MODE ? (JSON.parse(localStorage.getItem("cv-publications-v1")) || window.publications.slice()) : window.publications.slice(); } catch { publications = window.publications.slice(); }
+  try { publications = EDIT_MODE ? (JSON.parse(localStorage.getItem("cv-publications-v2")) || window.publications.slice()) : window.publications.slice(); } catch { publications = window.publications.slice(); }
   if (!EDIT_MODE) publications.sort((a, b) => (b.year - a.year) || ((b.month || 0) - (a.month || 0)) || a.title.localeCompare(b.title));
 
   function escapeHtml(value) {
@@ -59,7 +59,7 @@
     const updateUndoButton = () => { if (undoButton) undoButton.disabled = history.length === 0; };
     const remember = () => { history.push(JSON.stringify({ content: activeContent, publications })); if (history.length > 50) history.shift(); updateUndoButton(); };
     const setPath = (path, value) => { const keys = path.split("."); const finalKey = keys.pop(); const target = keys.reduce((obj, key) => obj[key], activeContent); target[finalKey] = value; };
-    const persist = () => { localStorage.setItem("cv-site-content-v3", JSON.stringify(activeContent)); localStorage.setItem("cv-publications-v1", JSON.stringify(publications)); const status = document.getElementById("save-status"); if (status) status.textContent = "已保存到本机"; };
+    const persist = () => { localStorage.setItem("cv-site-content-v4", JSON.stringify(activeContent)); localStorage.setItem("cv-publications-v2", JSON.stringify(publications)); const status = document.getElementById("save-status"); if (status) status.textContent = "已保存到本机"; };
     document.addEventListener("focusin", (event) => { if (event.target.closest("[data-edit-path]")) remember(); });
     document.addEventListener("input", (event) => { const node = event.target.closest("[data-edit-path]"); if (!node) return; setPath(node.dataset.editPath, node.textContent.trim()); persist(); });
     let dragging = null;

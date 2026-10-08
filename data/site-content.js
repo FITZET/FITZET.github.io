@@ -126,7 +126,7 @@ window.siteContent = {
         {
           "date": "2026",
           "title": "IEEE CASS Outreach Event Organization",
-          "text": "As Chair of the IEEE CASS-EDS-SSCS HUST Student Chapter, assisted in organizing IEEE CASS Wudang Outreach and IEEE CASS & CCF Outreach–Guilin."
+          "text": "As Chair of the IEEE CASS-EDS-SSCS HUST Student Chapter, assisted in organizing IEEE CASS Wudang Outreach and IEEE CASS & CCF Outreach–Vietnam/Guilin."
         },
         {
           "date": "2025",
@@ -157,12 +157,12 @@ window.siteContent = {
         {
           "date": "2026",
           "title": "Chair",
-          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; assisted in organizing IEEE CASS Wudang Outreach and IEEE CASS & CCF Outreach–Guilin."
+          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; Assisted in organizing IEEE CASS Wudang Outreach;Assisted in organizing IEEE CASS & CCF Outreach–Vietnam;Assisted in organizing IEEE CASS & CCF Outreach–Guilin."
         },
         {
           "date": "2025",
           "title": "Vice Chair",
-          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; assisted in organizing ISICAS 2025 and ISCAS 2025."
+          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; Assisted in organizing ISICAS 2025;Assisted in organizing ISCAS 2025."
         },
         {
           "date": "2024",
