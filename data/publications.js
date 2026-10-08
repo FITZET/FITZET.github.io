@@ -39,6 +39,7 @@ window.publications = [
     ],
     "venue": "IEEE Journal of Solid-State Circuits, 2026 (accepted)",
     "shortVenue": "JSSC",
+    "coFirstAuthor": true,
     "localPdf": "publication/2026-jssc-lung-sound-processor.pdf",
     "summary": "A 55-nm reconfigurable dual-mode AI processor using a two-stage hybrid neural network for energy-efficient wearable lung-sound monitoring."
   },

@@ -2,7 +2,7 @@
   "use strict";
 
   function savedContent() {
-    try { return JSON.parse(localStorage.getItem("cv-site-content-v4")) || window.siteContent; } catch { return window.siteContent; }
+    try { return JSON.parse(localStorage.getItem("cv-site-content-v5")) || window.siteContent; } catch { return window.siteContent; }
   }
   const EDIT_MODE = document.body.classList.contains("editing");
   let activeContent;
@@ -21,7 +21,7 @@
     if (section.type === "research") return `<section class="section">${heading}${(section.body || []).map((p, i) => `<p>${editable(p, `${path}.body.${i}`)}</p>`).join("")}${cards}${controls}</section>`;
     if (section.type === "cards") return `<section class="section">${heading}${cards}${controls}</section>`;
     if (section.type === "news") return `<section class="section"><div class="section-heading-row">${heading}<span class="section-note">${editable(section.note || "", `${path}.note`)}</span></div><ul class="news-list" data-sort-list="${path}.items">${(section.items || []).map((item, i) => `<li ${EDIT_MODE ? `draggable="true" data-sort-index="${i}"` : ""}><time>${editable(item.date, `${path}.items.${i}.date`)}</time><span class="news-tag ${escapeHtml((item.tag || "").toLowerCase())}">${editable(item.tag, `${path}.items.${i}.tag`)}</span><span>${editable(item.text, `${path}.items.${i}.text`)}</span></li>`).join("")}</ul>${controls}</section>`;
-    if (section.type === "timeline") return `<section class="section">${heading}<ul class="activity-list" data-sort-list="${path}.items">${(section.items || []).map((item, i) => `<li ${EDIT_MODE ? `draggable="true" data-sort-index="${i}"` : ""}><time>${editable(item.date, `${path}.items.${i}.date`)}</time><div><strong>${editable(item.title, `${path}.items.${i}.title`)}</strong>${item.text ? `<br>${editable(item.text, `${path}.items.${i}.text`)}` : ""}</div></li>`).join("")}</ul>${controls}</section>`;
+    if (section.type === "timeline") return `<section class="section">${heading}<ul class="activity-list" data-sort-list="${path}.items">${(section.items || []).map((item, i) => `<li ${EDIT_MODE ? `draggable="true" data-sort-index="${i}"` : ""}><time>${editable(item.date, `${path}.items.${i}.date`)}</time><div class="activity-copy"><strong>${editable(item.title, `${path}.items.${i}.title`)}</strong>${item.text ? `<span class="activity-affiliation">${editable(item.text, `${path}.items.${i}.text`)}</span>` : ""}${item.details?.length ? `<ul class="activity-details">${item.details.map((detail, detailIndex) => `<li>${editable(detail, `${path}.items.${i}.details.${detailIndex}`)}</li>`).join("")}</ul>` : ""}</div></li>`).join("")}</ul>${controls}</section>`;
     return `<section class="section">${heading}${(section.body || []).map((p, i) => `<p>${editable(p, `${path}.body.${i}`)}</p>`).join("")}${controls}</section>`;
   }
 
@@ -37,9 +37,13 @@
   const SELF = "Zixuan Shen";
   const list = document.getElementById("publication-list");
   const counter = document.getElementById("publication-count");
+  const publicationToggle = document.getElementById("publication-toggle");
   const buttons = Array.from(document.querySelectorAll(".filter-button"));
+  const INITIAL_PUBLICATION_COUNT = 8;
+  let activeFilter = "all";
+  let showAllPublications = EDIT_MODE;
   let publications;
-  try { publications = EDIT_MODE ? (JSON.parse(localStorage.getItem("cv-publications-v2")) || window.publications.slice()) : window.publications.slice(); } catch { publications = window.publications.slice(); }
+  try { publications = EDIT_MODE ? (JSON.parse(localStorage.getItem("cv-publications-v3")) || window.publications.slice()) : window.publications.slice(); } catch { publications = window.publications.slice(); }
   if (!EDIT_MODE) publications.sort((a, b) => (b.year - a.year) || ((b.month || 0) - (a.month || 0)) || a.title.localeCompare(b.title));
 
   function escapeHtml(value) {
@@ -59,7 +63,7 @@
     const updateUndoButton = () => { if (undoButton) undoButton.disabled = history.length === 0; };
     const remember = () => { history.push(JSON.stringify({ content: activeContent, publications })); if (history.length > 50) history.shift(); updateUndoButton(); };
     const setPath = (path, value) => { const keys = path.split("."); const finalKey = keys.pop(); const target = keys.reduce((obj, key) => obj[key], activeContent); target[finalKey] = value; };
-    const persist = () => { localStorage.setItem("cv-site-content-v4", JSON.stringify(activeContent)); localStorage.setItem("cv-publications-v2", JSON.stringify(publications)); const status = document.getElementById("save-status"); if (status) status.textContent = "已保存到本机"; };
+    const persist = () => { localStorage.setItem("cv-site-content-v5", JSON.stringify(activeContent)); localStorage.setItem("cv-publications-v3", JSON.stringify(publications)); const status = document.getElementById("save-status"); if (status) status.textContent = "已保存到本机"; };
     document.addEventListener("focusin", (event) => { if (event.target.closest("[data-edit-path]")) remember(); });
     document.addEventListener("input", (event) => { const node = event.target.closest("[data-edit-path]"); if (!node) return; setPath(node.dataset.editPath, node.textContent.trim()); persist(); });
     let dragging = null;
@@ -135,42 +139,68 @@
     return links.join("");
   }
 
+  function renderPublicationCard(paper, index) {
+    const badges = [];
+    if (paper.coFirstAuthor) badges.push('<span class="paper-badge co-first">Co-first author</span>');
+    if (paper.award) badges.push(`<span class="paper-badge award">${escapeHtml(paper.award)}</span>`);
+    return `
+      <article class="publication-card" ${EDIT_MODE ? `draggable="true" data-publication-index="${index}"` : ""}>
+        <div class="paper-thumb${paper.image ? " has-image" : ""}" aria-hidden="true">
+          ${paper.image ? `<img src="${escapeHtml(paper.image)}" alt="" loading="lazy">` : ""}
+          <span class="thumb-year">${paper.year}</span>
+          <span class="thumb-venue">${escapeHtml(paper.shortVenue || "Publication")}</span>
+        </div>
+        <div class="publication-copy">
+          <a class="publication-title" href="${escapeHtml(paperUrl(paper))}" target="_blank" rel="noreferrer">${escapeHtml(paper.title)}</a>
+          <p class="authors">${renderAuthors(paper.authors)}</p>
+          <p class="venue-line">${escapeHtml(paper.venue)}</p>
+          ${badges.length ? `<div class="paper-badges">${badges.join("")}</div>` : ""}
+          ${paper.summary ? `<p class="paper-summary">${escapeHtml(paper.summary)}</p>` : ""}
+          <div class="paper-links">${paperLinks(paper)}</div>
+        </div>
+      </article>`;
+  }
+
   function render(filter) {
+    activeFilter = filter;
     const filtered = publications.map((paper, index) => ({ paper, index })).filter(({ paper }) => {
       if (filter === "all") return true;
-      if (filter === "first-author") return paper.authors[0] === SELF;
+      if (filter === "first-author") return paper.authors[0] === SELF || paper.coFirstAuthor === true;
       return paper.type === filter;
     });
 
-    let currentYear = null;
     const chunks = [];
+    const visible = showAllPublications ? filtered : filtered.slice(0, INITIAL_PUBLICATION_COUNT);
 
-    filtered.forEach(({ paper, index }) => {
-      if (paper.year !== currentYear) {
-        currentYear = paper.year;
-        chunks.push(`<h3 class="year-heading">${paper.year}</h3>`);
-      }
-
-      chunks.push(`
-        <article class="publication-card" ${EDIT_MODE ? `draggable="true" data-publication-index="${index}"` : ""}>
-          <div class="paper-thumb${paper.image ? " has-image" : ""}" aria-hidden="true">
-            ${paper.image ? `<img src="${escapeHtml(paper.image)}" alt="" loading="lazy">` : ""}
-            <span class="thumb-year">${paper.year}</span>
-            <span class="thumb-venue">${escapeHtml(paper.shortVenue || "Publication")}</span>
-          </div>
-          <div>
-            <a class="publication-title" href="${escapeHtml(paperUrl(paper))}" target="_blank" rel="noreferrer">${escapeHtml(paper.title)}</a>
-            <p class="authors">${renderAuthors(paper.authors)}</p>
-            <p class="venue-line">${escapeHtml(paper.venue)}</p>
-            ${paper.award ? `<p class="paper-award">${escapeHtml(paper.award)}</p>` : ""}
-            ${paper.summary ? `<p class="paper-summary">${escapeHtml(paper.summary)}</p>` : ""}
-            <div class="paper-links">${paperLinks(paper)}</div>
-          </div>
-        </article>`);
-    });
+    if (showAllPublications) {
+      const grouped = new Map();
+      visible.forEach((entry) => {
+        const entries = grouped.get(entry.paper.year) || [];
+        entries.push(entry);
+        grouped.set(entry.paper.year, entries);
+      });
+      Array.from(grouped.entries()).forEach(([year, entries], groupIndex) => {
+        const open = EDIT_MODE || groupIndex === 0 ? " open" : "";
+        chunks.push(`<details class="publication-year-group"${open}><summary><span>${year}</span><span>${entries.length} ${entries.length === 1 ? "paper" : "papers"}</span></summary><div class="publication-year-list">${entries.map(({ paper, index }) => renderPublicationCard(paper, index)).join("")}</div></details>`);
+      });
+    } else {
+      let currentYear = null;
+      visible.forEach(({ paper, index }) => {
+        if (paper.year !== currentYear) {
+          currentYear = paper.year;
+          chunks.push(`<h3 class="year-heading">${paper.year}</h3>`);
+        }
+        chunks.push(renderPublicationCard(paper, index));
+      });
+    }
 
     list.innerHTML = chunks.join("");
-    counter.textContent = `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}`;
+    counter.textContent = visible.length === filtered.length ? `${filtered.length} ${filtered.length === 1 ? "entry" : "entries"}` : `Showing ${visible.length} of ${filtered.length}`;
+    if (publicationToggle) {
+      publicationToggle.hidden = EDIT_MODE || filtered.length <= INITIAL_PUBLICATION_COUNT;
+      publicationToggle.textContent = showAllPublications ? "Show recent publications" : `Browse all ${filtered.length} publications`;
+      publicationToggle.setAttribute("aria-expanded", String(showAllPublications));
+    }
   }
 
   buttons.forEach((button) => {
@@ -182,6 +212,12 @@
       });
       render(button.dataset.filter || "all");
     });
+  });
+
+  publicationToggle?.addEventListener("click", () => {
+    showAllPublications = !showAllPublications;
+    render(activeFilter);
+    if (!showAllPublications) document.getElementById("publications")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   render("all");
