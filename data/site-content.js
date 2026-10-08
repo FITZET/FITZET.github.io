@@ -55,6 +55,16 @@ window.siteContent = {
       "note": "Recent updates",
       "items": [
         {
+          "date": "Sep. 2026",
+          "tag": "Paper",
+          "text": "Our energy- and area-efficient AdEx neuron design was accepted by IEEE TCAS-I."
+        },
+        {
+          "date": "Sep. 2026",
+          "tag": "Paper",
+          "text": "Our reconfigurable dual-mode AI processor for wearable lung-sound monitoring was accepted by IEEE JSSC."
+        },
+        {
           "date": "Aug. 2026",
           "tag": "Award",
           "text": "Our GALSNP work was accepted by IEEE A-SSCC 2026 and selected as a Highlighted Paper."
@@ -115,8 +125,13 @@ window.siteContent = {
       "items": [
         {
           "date": "2026",
-          "title": "IEEE CASS Event Organization",
-          "text": "Assisted IEEE CASS in organizing IEEE ISCAS 2026 and the IEEE CASS Wudang Workshop through the HUST Student Chapter, May 24–30, 2026."
+          "title": "IEEE CASS Outreach Event Organization",
+          "text": "As Chair of the IEEE CASS-EDS-SSCS HUST Student Chapter, assisted in organizing IEEE CASS Wudang Outreach and IEEE CASS & CCF Outreach–Guilin."
+        },
+        {
+          "date": "2025",
+          "title": "IEEE Conference Organization",
+          "text": "As Vice Chair of the IEEE CASS-EDS-SSCS HUST Student Chapter, assisted in organizing ISICAS 2025 and ISCAS 2025."
         },
         {
           "date": "2026",
@@ -142,12 +157,12 @@ window.siteContent = {
         {
           "date": "2026",
           "title": "Chair",
-          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter"
+          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; assisted in organizing IEEE CASS Wudang Outreach and IEEE CASS & CCF Outreach–Guilin."
         },
         {
           "date": "2025",
           "title": "Vice Chair",
-          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter"
+          "text": "IEEE CASS-EDS-SSCS HUST Student Chapter; assisted in organizing ISICAS 2025 and ISCAS 2025."
         },
         {
           "date": "2024",
@@ -167,5 +182,5 @@ window.siteContent = {
       ]
     }
   ],
-  "footer": "Last updated: August 2026"
+  "footer": "Last updated: October 2026"
 };

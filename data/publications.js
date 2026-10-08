@@ -1,6 +1,49 @@
 window.publications = [
   {
     "year": 2026,
+    "month": 9,
+    "type": "journal",
+    "title": "An Energy- and Area-Efficient AdEx Neuron Design Based on a Novel Area-Efficient Fast-Convergence CORDIC",
+    "authors": [
+      "Zixuan Shen",
+      "Yujie Li",
+      "Jipeng Wang",
+      "Guangyou Hong",
+      "Kwen-Siong Chong",
+      "Yongkui Yang",
+      "Bah Hwee Gwee",
+      "Chao Wang"
+    ],
+    "venue": "IEEE Transactions on Circuits and Systems I: Regular Papers, 2026 (accepted)",
+    "shortVenue": "TCAS-I",
+    "doi": "10.1109/TCSI.2026.3736430",
+    "localPdf": "publication/2026-tcasi-adex-neuron.pdf",
+    "summary": "An energy- and area-efficient digital AdEx neuron combining a fast-convergence CORDIC, heterogeneous-operator pipeline scheduling, and a time-multiplexed reconfigurable architecture."
+  },
+  {
+    "year": 2026,
+    "month": 9,
+    "type": "journal",
+    "title": "An Energy-Efficient, Reconfigurable and Dual-Mode AI Processor Based on a Two-Stage Hybrid Neural Network for Wearable Lung Sound Monitoring",
+    "authors": [
+      "Keyi Yang",
+      "Zixuan Shen",
+      "Zhirui Huang",
+      "Bingqiang Liu",
+      "Heng Ping",
+      "Ziyuan Wen",
+      "Jiahao Liu",
+      "Jun Zhou",
+      "Kian Ann Ng",
+      "Chao Wang"
+    ],
+    "venue": "IEEE Journal of Solid-State Circuits, 2026 (accepted)",
+    "shortVenue": "JSSC",
+    "localPdf": "publication/2026-jssc-lung-sound-processor.pdf",
+    "summary": "A 55-nm reconfigurable dual-mode AI processor using a two-stage hybrid neural network for energy-efficient wearable lung-sound monitoring."
+  },
+  {
+    "year": 2026,
     "month": 8,
     "type": "conference",
     "title": "GALSNP: A GALS Reconfigurable Neuromorphic Processor Enabling Manifold-Based Hybrid ANN-SNN and Gradient-Free On-Chip Adaptation",
